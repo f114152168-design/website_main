@@ -1,9 +1,10 @@
 # Sets up the routes for all the pages
 
-from flask import Flask, render_template, request, make_response
+from flask import Flask, render_template, request, make_response, jsonify
 from flask_caching import Cache
 from config import TEMPLATES_PATH, TEXT_PATH
 from application.helpers import *
+from application.ai_service import generate_text
 
 
 app = Flask(__name__, template_folder=TEMPLATES_PATH)
@@ -83,3 +84,37 @@ def result():
     """Renders the 'Result' page of the website."""
 
     return render_template("result.html")
+
+
+@app.route("/ai-generator")
+def ai_generator():
+    """Renders the 'AI Text Generator' page of the website."""
+    
+    return render_template("ai_generator.html")
+
+
+@app.route("/generate-text", methods=["POST"])
+def generate_ai_text():
+    """Generate text using AI based on user prompt."""
+    
+    try:
+        data = request.get_json()
+        prompt = data.get("prompt", "").strip()
+        
+        if not prompt:
+            return jsonify({"error": "提示詞不能為空"}), 400
+        
+        if len(prompt) > 1000:
+            return jsonify({"error": "提示詞過長，請限制在1000字以內"}), 400
+        
+        # Generate text using AI service
+        result = generate_text(prompt)
+        
+        if result.startswith("Error:"):
+            return jsonify({"error": result}), 500
+        
+        return jsonify({"result": result}), 200
+    
+    except Exception as error:
+        print(f"ERROR! {error}.")
+        return jsonify({"error": "伺服器錯誤，請稍後重試"}), 500
