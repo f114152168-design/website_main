@@ -2,8 +2,6 @@
 
 from openai import OpenAI
 import os
-import base64
-from io import BytesIO
 
 
 def get_ai_client():
