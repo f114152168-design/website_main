@@ -4,7 +4,7 @@ from flask import Flask, render_template, request, make_response, jsonify
 from flask_caching import Cache
 from config import TEMPLATES_PATH, TEXT_PATH
 from application.helpers import *
-from application.ai_service import generate_text
+from application.ai_service import generate_text, generate_image
 
 
 app = Flask(__name__, template_folder=TEMPLATES_PATH)
@@ -93,6 +93,13 @@ def ai_generator():
     return render_template("ai_generator.html")
 
 
+@app.route("/ai-image-generator")
+def ai_image_generator():
+    """Renders the 'AI Image Generator' page of the website."""
+    
+    return render_template("ai_image_generator.html")
+
+
 @app.route("/generate-text", methods=["POST"])
 def generate_ai_text():
     """Generate text using AI based on user prompt."""
@@ -109,6 +116,44 @@ def generate_ai_text():
         
         # Generate text using AI service
         result = generate_text(prompt)
+        
+        if result.startswith("Error:"):
+            return jsonify({"error": result}), 500
+        
+        return jsonify({"result": result}), 200
+    
+    except Exception as error:
+        print(f"ERROR! {error}.")
+        return jsonify({"error": "伺服器錯誤，請稍後重試"}), 500
+
+
+@app.route("/generate-image", methods=["POST"])
+def generate_ai_image():
+    """Generate image using AI based on user prompt."""
+    
+    try:
+        data = request.get_json()
+        prompt = data.get("prompt", "").strip()
+        size = data.get("size", "1024x1024")
+        quality = data.get("quality", "standard")
+        
+        if not prompt:
+            return jsonify({"error": "提示詞不能為空"}), 400
+        
+        if len(prompt) > 1000:
+            return jsonify({"error": "提示詞過長，請限制在1000字以內"}), 400
+        
+        # Validate size parameter
+        valid_sizes = ["1024x1024", "1024x1792", "1792x1024"]
+        if size not in valid_sizes:
+            size = "1024x1024"
+        
+        # Validate quality parameter
+        if quality not in ["standard", "hd"]:
+            quality = "standard"
+        
+        # Generate image using AI service
+        result = generate_image(prompt, size=size, quality=quality)
         
         if result.startswith("Error:"):
             return jsonify({"error": result}), 500
