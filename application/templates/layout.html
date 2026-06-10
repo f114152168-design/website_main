@@ -46,7 +46,15 @@
                         <li class="nav-item"><a class="nav-link me-3 {{ request.path | is_active(url_for('skills')) }}" href="{{ url_for('skills') }}">Skills</a></li>
                         <li class="nav-item"><a class="nav-link me-3 {{ request.path | is_active(url_for('portfolio')) }}" href="{{ url_for('portfolio') }}">Portfolio</a></li>
                         <li class="nav-item"><a class="nav-link me-3 {{ request.path | is_active(url_for('contact')) }}" href="{{ url_for ('contact') }}">Contact</a></li>
-                        <li class="nav-item"><a class="nav-link me-3 {{ request.path | is_active(url_for('ai_generator')) }}" href="{{ url_for('ai_generator') }}"><i class="bx bx-wand-magic-smile"></i> AI Generator</a></li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link me-3 dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bx bx-wand-magic-smile"></i> AI Tools
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ url_for('ai_generator') }}"><i class="bx bx-text"></i> Text Generator</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('ai_image_generator') }}"><i class="bx bx-image"></i> Image Generator</a></li>
+                            </ul>
+                        </li>
                     </ul>
                 </div>
                 <!-- End of Navigation Menu -->
